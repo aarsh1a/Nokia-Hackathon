@@ -10,7 +10,10 @@ import {
   Legend,
 } from "recharts";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { cellTopology, linkColors } from "@/data/networkData";
+import { useStreamingData } from "@/hooks/useStreamingData";
+import { RotateCcw, FastForward } from "lucide-react";
 
 // Generate per-cell traffic data with correlation for same-link cells
 function generateCellTrafficData(cellId: string, duration: number = 300) {
@@ -75,9 +78,10 @@ const CELL_COLORS = [
 
 interface CellTrafficChartProps {
   mode: "throughput" | "packetLoss";
+  streaming?: boolean;
 }
 
-export function CellTrafficChart({ mode }: CellTrafficChartProps) {
+export function CellTrafficChart({ mode, streaming = true }: CellTrafficChartProps) {
   const [selectedCells, setSelectedCells] = useState<string[]>(["cell_1", "cell_9", "cell_17"]);
 
   const toggleCell = (cellId: string) => {
@@ -90,7 +94,8 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
     });
   };
 
-  const chartData = useMemo(() => {
+  // Generate full data
+  const fullChartData = useMemo(() => {
     if (selectedCells.length === 0) return [];
 
     const allSeries = selectedCells.map((cellId) => ({
@@ -113,6 +118,21 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
       return row;
     });
   }, [selectedCells, mode]);
+
+  // Streaming hook
+  const {
+    data: chartData,
+    isStreaming,
+    progress,
+    restart,
+    skipToEnd,
+    visiblePoints,
+    totalPoints,
+  } = useStreamingData(fullChartData, {
+    interval: 40,
+    enabled: streaming,
+  });
+
 
   // Group cells by link
   const cellsByLink = useMemo(() => {
@@ -151,7 +171,7 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
                 {cells.map((cell) => (
                   <label
                     key={cell.cellId}
-                    className={`flex items-center gap-1.5 text-xs cursor-pointer px-2 py-1 rounded border ${
+                    className={`flex items-center gap-1.5 text-xs cursor-pointer px-2 py-1 rounded border transition-all ${
                       selectedCells.includes(cell.cellId)
                         ? "border-primary/50 bg-primary/10"
                         : "border-transparent hover:bg-secondary/50"
@@ -182,7 +202,7 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
                 return (
                   <label
                     key={cell.cellId}
-                    className={`flex items-center gap-1.5 text-xs cursor-pointer px-2 py-1 rounded border ${
+                    className={`flex items-center gap-1.5 text-xs cursor-pointer px-2 py-1 rounded border transition-all ${
                       selectedCells.includes(cell.cellId)
                         ? "border-primary/50 bg-primary/10"
                         : "border-transparent hover:bg-secondary/50"
@@ -202,6 +222,52 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
         )}
       </div>
 
+      {/* Streaming controls */}
+      {streaming && selectedCells.length > 0 && (
+        <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2"
+              onClick={restart}
+              disabled={isStreaming}
+            >
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Replay
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2"
+              onClick={skipToEnd}
+              disabled={!isStreaming}
+            >
+              <FastForward className="w-3 h-3 mr-1" />
+              Skip
+            </Button>
+          </div>
+          
+          <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-100 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          
+          <div className="text-muted-foreground min-w-[80px] text-right">
+            {isStreaming && (
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                Live
+              </span>
+            )}
+            {!isStreaming && progress >= 100 && "Complete"}
+            <span className="ml-2">{visiblePoints}/{totalPoints}</span>
+          </div>
+        </div>
+      )}
+
       {/* Chart */}
       {selectedCells.length === 0 ? (
         <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
@@ -217,6 +283,7 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
                 stroke="hsl(var(--muted-foreground))"
                 tickFormatter={(v) => `${v}s`}
                 fontSize={12}
+                domain={[0, 300]}
               />
               <YAxis
                 stroke="hsl(var(--muted-foreground))"
@@ -252,6 +319,7 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
                   stroke={CELL_COLORS[i % CELL_COLORS.length]}
                   strokeWidth={1.5}
                   dot={false}
+                  isAnimationActive={false}
                 />
               ))}
             </LineChart>
@@ -260,8 +328,8 @@ export function CellTrafficChart({ mode }: CellTrafficChartProps) {
       )}
 
       {/* Observation hint */}
-      {selectedCells.length > 1 && (
-        <div className="text-xs text-muted-foreground p-3 rounded bg-secondary/20 border border-border">
+      {selectedCells.length > 1 && !isStreaming && (
+        <div className="text-xs text-muted-foreground p-3 rounded bg-secondary/20 border border-border animate-fade-in">
           <span className="text-foreground font-medium">Observation:</span> Cells on the same 
           fronthaul link show synchronized{" "}
           {mode === "throughput" ? "traffic spikes" : "packet loss events"} during congestion periods.

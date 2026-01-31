@@ -177,30 +177,84 @@ export function calculateLinkData(): LinkData[] {
     });
 }
 
-// Generate correlation matrix for cells
+// Real correlation matrix from eval1_results.json
+// Order: cell_1, cell_9, cell_17, cell_22, cell_8, cell_10, cell_18, cell_19, cell_4, cell_5, cell_12, cell_20, cell_7, cell_13, cell_15, cell_16, cell_2, cell_6, cell_23, cell_24, cell_11, cell_14, cell_21, cell_3
+export const realCorrelationData: Record<string, Record<string, number>> = {
+  "cell_1": {"cell_1": 1.0, "cell_9": 0.9656, "cell_17": 0.8771, "cell_22": 0.9483, "cell_8": 0.0079, "cell_10": 0.0079, "cell_18": 0.0, "cell_19": 0.0092, "cell_4": 0.0, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0171, "cell_13": 0.0303, "cell_15": 0.0276, "cell_16": 0.0303, "cell_2": 0.0053, "cell_6": 0.0053, "cell_23": 0.0026, "cell_24": 0.0013, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_9": {"cell_1": 0.9656, "cell_9": 1.0, "cell_17": 0.6386, "cell_22": 0.6741, "cell_8": 0.0, "cell_10": 0.0, "cell_18": 0.0, "cell_19": 0.0, "cell_4": 0.0, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0207, "cell_13": 0.0361, "cell_15": 0.0344, "cell_16": 0.0327, "cell_2": 0.0052, "cell_6": 0.0069, "cell_23": 0.0052, "cell_24": 0.0034, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_17": {"cell_1": 0.8771, "cell_9": 0.6386, "cell_17": 1.0, "cell_22": 0.6193, "cell_8": 0.0072, "cell_10": 0.0072, "cell_18": 0.0072, "cell_19": 0.0072, "cell_4": 0.0, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0361, "cell_13": 0.0482, "cell_15": 0.0458, "cell_16": 0.0506, "cell_2": 0.0, "cell_6": 0.0024, "cell_23": 0.0024, "cell_24": 0.0024, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_22": {"cell_1": 0.9483, "cell_9": 0.6741, "cell_17": 0.6193, "cell_22": 1.0, "cell_8": 0.0155, "cell_10": 0.0155, "cell_18": 0.0052, "cell_19": 0.0172, "cell_4": 0.0, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0224, "cell_13": 0.0397, "cell_15": 0.0362, "cell_16": 0.0397, "cell_2": 0.0069, "cell_6": 0.0069, "cell_23": 0.0034, "cell_24": 0.0017, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_8": {"cell_1": 0.0079, "cell_9": 0.0, "cell_17": 0.0072, "cell_22": 0.0155, "cell_8": 1.0, "cell_10": 0.9497, "cell_18": 0.9362, "cell_19": 0.9476, "cell_4": 0.0, "cell_5": 0.0193, "cell_12": 0.021, "cell_20": 0.0105, "cell_7": 0.0334, "cell_13": 0.035, "cell_15": 0.034, "cell_16": 0.0318, "cell_2": 0.0885, "cell_6": 0.0782, "cell_23": 0.1026, "cell_24": 0.1062, "cell_11": 0.0842, "cell_14": 0.024, "cell_21": 0.0649, "cell_3": 0.0739},
+  "cell_10": {"cell_1": 0.0079, "cell_9": 0.0, "cell_17": 0.0072, "cell_22": 0.0155, "cell_8": 0.9497, "cell_10": 1.0, "cell_18": 0.775, "cell_19": 0.9523, "cell_4": 0.0031, "cell_5": 0.0231, "cell_12": 0.0231, "cell_20": 0.0105, "cell_7": 0.0356, "cell_13": 0.0383, "cell_15": 0.0388, "cell_16": 0.0362, "cell_2": 0.0791, "cell_6": 0.0597, "cell_23": 0.0839, "cell_24": 0.0912, "cell_11": 0.0505, "cell_14": 0.022, "cell_21": 0.0344, "cell_3": 0.0413},
+  "cell_18": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0072, "cell_22": 0.0052, "cell_8": 0.9362, "cell_10": 0.775, "cell_18": 1.0, "cell_19": 0.9463, "cell_4": 0.0031, "cell_5": 0.0231, "cell_12": 0.0231, "cell_20": 0.0105, "cell_7": 0.0364, "cell_13": 0.0395, "cell_15": 0.0395, "cell_16": 0.0358, "cell_2": 0.0822, "cell_6": 0.0743, "cell_23": 0.0885, "cell_24": 0.108, "cell_11": 0.0442, "cell_14": 0.014, "cell_21": 0.0286, "cell_3": 0.0326},
+  "cell_19": {"cell_1": 0.0092, "cell_9": 0.0, "cell_17": 0.0072, "cell_22": 0.0172, "cell_8": 0.9476, "cell_10": 0.9523, "cell_18": 0.9463, "cell_19": 1.0, "cell_4": 0.0, "cell_5": 0.0212, "cell_12": 0.0231, "cell_20": 0.0105, "cell_7": 0.0311, "cell_13": 0.0328, "cell_15": 0.0318, "cell_16": 0.0305, "cell_2": 0.088, "cell_6": 0.0773, "cell_23": 0.1011, "cell_24": 0.1053, "cell_11": 0.08, "cell_14": 0.024, "cell_21": 0.0611, "cell_3": 0.0696},
+  "cell_4": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.0, "cell_10": 0.0031, "cell_18": 0.0031, "cell_19": 0.0, "cell_4": 1.0, "cell_5": 0.6301, "cell_12": 0.3699, "cell_20": 0.8997, "cell_7": 0.0031, "cell_13": 0.0031, "cell_15": 0.0031, "cell_16": 0.0031, "cell_2": 0.0125, "cell_6": 0.0157, "cell_23": 0.0157, "cell_24": 0.0157, "cell_11": 0.0, "cell_14": 0.0031, "cell_21": 0.0031, "cell_3": 0.0031},
+  "cell_5": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.0193, "cell_10": 0.0231, "cell_18": 0.0231, "cell_19": 0.0212, "cell_4": 0.6301, "cell_5": 1.0, "cell_12": 0.7227, "cell_20": 0.8979, "cell_7": 0.0019, "cell_13": 0.0019, "cell_15": 0.0019, "cell_16": 0.0019, "cell_2": 0.0077, "cell_6": 0.0096, "cell_23": 0.0096, "cell_24": 0.0096, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_12": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.021, "cell_10": 0.0231, "cell_18": 0.0231, "cell_19": 0.0231, "cell_4": 0.3699, "cell_5": 0.7227, "cell_12": 1.0, "cell_20": 0.9475, "cell_7": 0.0063, "cell_13": 0.0063, "cell_15": 0.0063, "cell_16": 0.0063, "cell_2": 0.0, "cell_6": 0.0, "cell_23": 0.0, "cell_24": 0.0, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_20": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.0105, "cell_10": 0.0105, "cell_18": 0.0105, "cell_19": 0.0105, "cell_4": 0.8997, "cell_5": 0.8979, "cell_12": 0.9475, "cell_20": 1.0, "cell_7": 0.0053, "cell_13": 0.0053, "cell_15": 0.0053, "cell_16": 0.0053, "cell_2": 0.0118, "cell_6": 0.0131, "cell_23": 0.0131, "cell_24": 0.0131, "cell_11": 0.0, "cell_14": 0.0, "cell_21": 0.0, "cell_3": 0.0},
+  "cell_7": {"cell_1": 0.0171, "cell_9": 0.0207, "cell_17": 0.0361, "cell_22": 0.0224, "cell_8": 0.0334, "cell_10": 0.0356, "cell_18": 0.0364, "cell_19": 0.0311, "cell_4": 0.0031, "cell_5": 0.0019, "cell_12": 0.0063, "cell_20": 0.0053, "cell_7": 1.0, "cell_13": 0.9095, "cell_15": 0.9624, "cell_16": 0.9415, "cell_2": 0.0535, "cell_6": 0.0492, "cell_23": 0.0557, "cell_24": 0.0645, "cell_11": 0.0042, "cell_14": 0.006, "cell_21": 0.0038, "cell_3": 0.0043},
+  "cell_13": {"cell_1": 0.0303, "cell_9": 0.0361, "cell_17": 0.0482, "cell_22": 0.0397, "cell_8": 0.035, "cell_10": 0.0383, "cell_18": 0.0395, "cell_19": 0.0328, "cell_4": 0.0031, "cell_5": 0.0019, "cell_12": 0.0063, "cell_20": 0.0053, "cell_7": 0.9095, "cell_13": 1.0, "cell_15": 0.9511, "cell_16": 0.9286, "cell_2": 0.055, "cell_6": 0.0501, "cell_23": 0.0572, "cell_24": 0.0652, "cell_11": 0.0042, "cell_14": 0.006, "cell_21": 0.0038, "cell_3": 0.0043},
+  "cell_15": {"cell_1": 0.0276, "cell_9": 0.0344, "cell_17": 0.0458, "cell_22": 0.0362, "cell_8": 0.034, "cell_10": 0.0388, "cell_18": 0.0395, "cell_19": 0.0318, "cell_4": 0.0031, "cell_5": 0.0019, "cell_12": 0.0063, "cell_20": 0.0053, "cell_7": 0.9624, "cell_13": 0.9511, "cell_15": 1.0, "cell_16": 0.9499, "cell_2": 0.0545, "cell_6": 0.0506, "cell_23": 0.0567, "cell_24": 0.0652, "cell_11": 0.0042, "cell_14": 0.006, "cell_21": 0.0038, "cell_3": 0.0043},
+  "cell_16": {"cell_1": 0.0303, "cell_9": 0.0327, "cell_17": 0.0506, "cell_22": 0.0397, "cell_8": 0.0318, "cell_10": 0.0362, "cell_18": 0.0358, "cell_19": 0.0305, "cell_4": 0.0031, "cell_5": 0.0019, "cell_12": 0.0063, "cell_20": 0.0053, "cell_7": 0.9415, "cell_13": 0.9286, "cell_15": 0.9499, "cell_16": 1.0, "cell_2": 0.0559, "cell_6": 0.0501, "cell_23": 0.0572, "cell_24": 0.0648, "cell_11": 0.0042, "cell_14": 0.006, "cell_21": 0.0038, "cell_3": 0.0043},
+  "cell_2": {"cell_1": 0.0053, "cell_9": 0.0052, "cell_17": 0.0, "cell_22": 0.0069, "cell_8": 0.0885, "cell_10": 0.0791, "cell_18": 0.0822, "cell_19": 0.088, "cell_4": 0.0125, "cell_5": 0.0077, "cell_12": 0.0, "cell_20": 0.0118, "cell_7": 0.0535, "cell_13": 0.055, "cell_15": 0.0545, "cell_16": 0.0559, "cell_2": 1.0, "cell_6": 0.8881, "cell_23": 0.885, "cell_24": 0.8891, "cell_11": 0.0126, "cell_14": 0.026, "cell_21": 0.0153, "cell_3": 0.0},
+  "cell_6": {"cell_1": 0.0053, "cell_9": 0.0069, "cell_17": 0.0024, "cell_22": 0.0069, "cell_8": 0.0782, "cell_10": 0.0597, "cell_18": 0.0743, "cell_19": 0.0773, "cell_4": 0.0157, "cell_5": 0.0096, "cell_12": 0.0, "cell_20": 0.0131, "cell_7": 0.0492, "cell_13": 0.0501, "cell_15": 0.0506, "cell_16": 0.0501, "cell_2": 0.8881, "cell_6": 1.0, "cell_23": 0.8788, "cell_24": 0.8974, "cell_11": 0.0105, "cell_14": 0.026, "cell_21": 0.0134, "cell_3": 0.0},
+  "cell_23": {"cell_1": 0.0026, "cell_9": 0.0052, "cell_17": 0.0024, "cell_22": 0.0034, "cell_8": 0.1026, "cell_10": 0.0839, "cell_18": 0.0885, "cell_19": 0.1011, "cell_4": 0.0157, "cell_5": 0.0096, "cell_12": 0.0, "cell_20": 0.0131, "cell_7": 0.0557, "cell_13": 0.0572, "cell_15": 0.0567, "cell_16": 0.0572, "cell_2": 0.885, "cell_6": 0.8788, "cell_23": 1.0, "cell_24": 0.8907, "cell_11": 0.0147, "cell_14": 0.03, "cell_21": 0.0172, "cell_3": 0.0},
+  "cell_24": {"cell_1": 0.0013, "cell_9": 0.0034, "cell_17": 0.0024, "cell_22": 0.0017, "cell_8": 0.1062, "cell_10": 0.0912, "cell_18": 0.108, "cell_19": 0.1053, "cell_4": 0.0157, "cell_5": 0.0096, "cell_12": 0.0, "cell_20": 0.0131, "cell_7": 0.0645, "cell_13": 0.0652, "cell_15": 0.0652, "cell_16": 0.0648, "cell_2": 0.8891, "cell_6": 0.8974, "cell_23": 0.8907, "cell_24": 1.0, "cell_11": 0.0105, "cell_14": 0.026, "cell_21": 0.0134, "cell_3": 0.0},
+  "cell_11": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.0842, "cell_10": 0.0505, "cell_18": 0.0442, "cell_19": 0.08, "cell_4": 0.0, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0042, "cell_13": 0.0042, "cell_15": 0.0042, "cell_16": 0.0042, "cell_2": 0.0126, "cell_6": 0.0105, "cell_23": 0.0147, "cell_24": 0.0105, "cell_11": 1.0, "cell_14": 0.5495, "cell_21": 0.6737, "cell_3": 0.6826},
+  "cell_14": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.024, "cell_10": 0.022, "cell_18": 0.014, "cell_19": 0.024, "cell_4": 0.0031, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.006, "cell_13": 0.006, "cell_15": 0.006, "cell_16": 0.006, "cell_2": 0.026, "cell_6": 0.026, "cell_23": 0.03, "cell_24": 0.026, "cell_11": 0.5495, "cell_14": 1.0, "cell_21": 0.62, "cell_3": 0.563},
+  "cell_21": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.0649, "cell_10": 0.0344, "cell_18": 0.0286, "cell_19": 0.0611, "cell_4": 0.0031, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0038, "cell_13": 0.0038, "cell_15": 0.0038, "cell_16": 0.0038, "cell_2": 0.0153, "cell_6": 0.0134, "cell_23": 0.0172, "cell_24": 0.0134, "cell_11": 0.6737, "cell_14": 0.62, "cell_21": 1.0, "cell_3": 0.6957},
+  "cell_3": {"cell_1": 0.0, "cell_9": 0.0, "cell_17": 0.0, "cell_22": 0.0, "cell_8": 0.0739, "cell_10": 0.0413, "cell_18": 0.0326, "cell_19": 0.0696, "cell_4": 0.0031, "cell_5": 0.0, "cell_12": 0.0, "cell_20": 0.0, "cell_7": 0.0043, "cell_13": 0.0043, "cell_15": 0.0043, "cell_16": 0.0043, "cell_2": 0.0, "cell_6": 0.0, "cell_23": 0.0, "cell_24": 0.0, "cell_11": 0.6826, "cell_14": 0.563, "cell_21": 0.6957, "cell_3": 1.0}
+};
+
+// Generate correlation matrix for cells using REAL data
 export function generateCorrelationMatrix(): { cells: string[]; matrix: number[][] } {
-  const cells = cellTopology.map(c => c.cellId);
+  // Order cells by link for better visualization
+  const orderedCells = [
+    // Link 1
+    "cell_1", "cell_9", "cell_17", "cell_22",
+    // Link 2
+    "cell_8", "cell_10", "cell_18", "cell_19",
+    // Link 3
+    "cell_4", "cell_5", "cell_12", "cell_20",
+    // Link 4
+    "cell_7", "cell_13", "cell_15", "cell_16",
+    // Link 5
+    "cell_2", "cell_6", "cell_23", "cell_24",
+    // Isolated
+    "cell_11", "cell_14", "cell_21", "cell_3"
+  ];
+  
   const matrix: number[][] = [];
   
-  for (let i = 0; i < cells.length; i++) {
+  for (const cellI of orderedCells) {
     const row: number[] = [];
-    for (let j = 0; j < cells.length; j++) {
-      if (i === j) {
-        row.push(1);
-      } else if (cellTopology[i].linkId === cellTopology[j].linkId) {
-        row.push(0.7 + Math.random() * 0.25);
-      } else {
-        row.push(0.1 + Math.random() * 0.2);
-      }
+    for (const cellJ of orderedCells) {
+      const value = realCorrelationData[cellI]?.[cellJ] ?? 0;
+      row.push(value);
     }
     matrix.push(row);
   }
   
-  return { cells, matrix };
+  return { cells: orderedCells, matrix };
 }
 
 export const datasets = [
-  { id: "dataset-1", name: "Peak Hour Traffic (12:00-13:00)", description: "High congestion period" },
-  { id: "dataset-2", name: "Evening Traffic (18:00-19:00)", description: "Moderate congestion" },
-  { id: "dataset-3", name: "Night Traffic (02:00-03:00)", description: "Low traffic baseline" },
+  { 
+    id: "live-analysis", 
+    name: "Live Analysis (Backend)", 
+    description: "Real-time analysis from raw judge data via backend API",
+    source: "http://localhost:8000/analyze",
+    cells: 24,
+    links: 9,
+    isLive: true,
+  },
+  { 
+    id: "eval1", 
+    name: "Eval1 Dataset (Static)", 
+    description: "Pre-computed topology from eval1_results.json",
+    source: "frontend/public/data/eval1_results.json",
+    cells: 24,
+    links: 9,
+    isLive: false,
+  },
 ];

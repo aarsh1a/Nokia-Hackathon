@@ -10,17 +10,22 @@ import {
   Legend,
 } from "recharts";
 import { generateTrafficData, calculateLinkData, linkColors } from "@/data/networkData";
+import { useStreamingData } from "@/hooks/useStreamingData";
+import { RotateCcw, FastForward } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface TrafficChartProps {
   linkIds: number[];
+  streaming?: boolean;
 }
 
-export function TrafficChart({ linkIds }: TrafficChartProps) {
+export function TrafficChart({ linkIds, streaming = true }: TrafficChartProps) {
   const linkDataList = useMemo(() => calculateLinkData(), []);
 
-  const { chartData, statsPerLink } = useMemo(() => {
+  // Generate full data
+  const { fullChartData, statsPerLink } = useMemo(() => {
     if (linkIds.length === 0) {
-      return { chartData: [], statsPerLink: [] };
+      return { fullChartData: [], statsPerLink: [] };
     }
 
     const duration = 300;
@@ -49,8 +54,23 @@ export function TrafficChart({ linkIds }: TrafficChartProps) {
       };
     });
 
-    return { chartData: merged, statsPerLink: stats };
+    return { fullChartData: merged, statsPerLink: stats };
   }, [linkIds, linkDataList]);
+
+  // Streaming hook
+  const {
+    data: chartData,
+    isStreaming,
+    progress,
+    restart,
+    skipToEnd,
+    visiblePoints,
+    totalPoints,
+  } = useStreamingData(fullChartData, {
+    interval: 30,
+    enabled: streaming,
+  });
+
 
   if (linkIds.length === 0) {
     return (
@@ -73,7 +93,7 @@ export function TrafficChart({ linkIds }: TrafficChartProps) {
         {statsPerLink.map((s) => (
           <div
             key={s.linkId}
-            className="p-3 rounded-lg bg-secondary/50 flex items-center gap-3 min-w-[140px]"
+            className="p-3 rounded-lg bg-secondary/50 flex items-center gap-3 min-w-[140px] transition-all"
           >
             <div
               className="w-2 h-8 rounded shrink-0"
@@ -91,6 +111,52 @@ export function TrafficChart({ linkIds }: TrafficChartProps) {
           </div>
         ))}
       </div>
+
+      {/* Streaming controls */}
+      {streaming && (
+        <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2"
+              onClick={restart}
+              disabled={isStreaming}
+            >
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Replay
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2"
+              onClick={skipToEnd}
+              disabled={!isStreaming}
+            >
+              <FastForward className="w-3 h-3 mr-1" />
+              Skip
+            </Button>
+          </div>
+          
+          <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-100 ease-linear"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          
+          <div className="text-muted-foreground min-w-[80px] text-right">
+            {isStreaming && (
+              <span className="inline-flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                Live
+              </span>
+            )}
+            {!isStreaming && progress >= 100 && "Complete"}
+            <span className="ml-2">{visiblePoints}/{totalPoints}</span>
+          </div>
+        </div>
+      )}
 
       {/* Chart */}
       <div className="h-[300px] w-full">
@@ -127,6 +193,7 @@ export function TrafficChart({ linkIds }: TrafficChartProps) {
               stroke="hsl(var(--muted-foreground))"
               tickFormatter={(value) => `${value}s`}
               fontSize={12}
+              domain={[0, 300]}
             />
             <YAxis
               stroke="hsl(var(--muted-foreground))"
@@ -167,6 +234,7 @@ export function TrafficChart({ linkIds }: TrafficChartProps) {
                   stroke={color}
                   strokeWidth={2}
                   fill={`url(#gradient-multi-${id})`}
+                  isAnimationActive={false}
                 />
               );
             })}
