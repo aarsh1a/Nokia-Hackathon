@@ -1,22 +1,19 @@
 """
-=============================================================================
-EVALUATION 1 DEMO SCRIPT
-5G Fronthaul Topology Inference - Nokia Hackathon
-=============================================================================
+evaluation 1 demo script
+5g fronthaul topology inference - nokia hackathon
 
-This script demonstrates the three key tests for Evaluation 1:
-- Test A: Scale correctness (2.2M rows, 24 cells)
-- Test B: Logical sanity (explainable inference)
-- Test C: Failure handling (graceful errors)
+this script demonstrates the three key tests for evaluation 1:
+- test a: scale correctness (2.2m rows, 24 cells)
+- test b: logical sanity (explainable inference)
+- test c: failure handling (graceful errors)
 
-Run: python demo_eval1.py
+run: python demo_eval1.py
 """
 
 import json
 import os
 import sys
 
-# Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from services.data_loader import load_data
@@ -26,7 +23,6 @@ from services.topology import infer_topology
 
 
 def print_header(title):
-    """Print a formatted section header."""
     print("\n" + "=" * 70)
     print(f"  {title}")
     print("=" * 70)
@@ -34,153 +30,135 @@ def print_header(title):
 
 def test_a_scale_correctness():
     """
-    TEST A: Scale Correctness (Mandatory)
-    -------------------------------------
-    Proves: System scales beyond toy data, pipeline is stable on real logs.
+    test a: scale correctness
+    proves: system scales beyond toy data, pipeline is stable on real logs.
     """
-    print_header("TEST A: SCALE CORRECTNESS")
+    print_header("test a: scale correctness")
     
-    print("\n📊 Loading full dataset from Nokia .dat files...")
+    print("\n[1] loading full dataset from nokia .dat files...")
     df = load_data("data/raw")
     
-    print("\n🔍 Running congestion detection...")
+    print("[2] running congestion detection...")
     df_cong = detect_congestion(df)
     
-    print("📈 Computing pairwise correlation matrix...")
+    print("[3] computing pairwise correlation matrix...")
     correlation_matrix = compute_congestion_correlation(df_cong)
     
-    print("🔗 Inferring shared link topology...")
+    print("[4] inferring shared link topology...")
     topology = infer_topology(correlation_matrix)
     
-    # Summary statistics
     total_rows = len(df)
     total_cells = df["cell_id"].nunique()
     congestion_events = df_cong["is_congested"].sum()
     inferred_links = len(set(topology.values()))
     
     print("\n" + "-" * 50)
-    print("  SCALE TEST RESULTS")
+    print("  results")
     print("-" * 50)
-    print(f"  ✅ Total rows processed:    {total_rows:,}")
-    print(f"  ✅ Number of cells:         {total_cells}")
-    print(f"  ✅ Congestion events:       {congestion_events:,}")
-    print(f"  ✅ Inferred shared links:   {inferred_links}")
+    print(f"  total rows processed:    {total_rows:,}")
+    print(f"  number of cells:         {total_cells}")
+    print(f"  congestion events:       {congestion_events:,}")
+    print(f"  inferred shared links:   {inferred_links}")
     print("-" * 50)
-    
-    print("\n📋 PPT Summary:")
-    print(f'   "Validated on {total_rows:,} rows from {total_cells} cells')
-    print(f'    → Detected {congestion_events:,} congestion events')
-    print(f'    → Inferred {inferred_links} shared fronthaul links"')
     
     return topology, correlation_matrix, df_cong
 
 
 def test_b_logical_sanity(topology, correlation_matrix):
     """
-    TEST B: Logical Sanity (Thinking Test)
-    --------------------------------------
-    Proves: Output is explainable, inference is justified.
+    test b: logical sanity
+    proves: output is explainable, inference is justified.
     """
-    print_header("TEST B: LOGICAL SANITY (EXPLAINABILITY)")
+    print_header("test b: logical sanity")
     
-    # Group cells by link
     links = {}
     for cell, link in topology.items():
         if link not in links:
             links[link] = []
         links[link].append(cell)
     
-    # Sort cells within each link
     for link in links:
         links[link] = sorted(links[link], key=lambda x: int(x.split('_')[1]))
     
-    print("\n🔗 INFERRED TOPOLOGY:")
+    print("\ninferred topology:")
     print("-" * 50)
     for link in sorted(links.keys()):
         cells = links[link]
-        print(f"  {link}: {', '.join(cells)}")
+        print(f"  {link.lower()}: {', '.join(cells)}")
     print("-" * 50)
     
-    # Deep dive into one link (pick the largest group)
     largest_link = max(links.keys(), key=lambda k: len(links[k]))
     cells_in_link = links[largest_link]
     
-    print(f"\n🔬 DEEP DIVE: {largest_link}")
-    print(f"   Cells: {', '.join(cells_in_link)}")
-    print("\n   Pairwise Correlation Matrix:")
-    print("   " + "-" * 40)
+    print(f"\ndeep dive: {largest_link.lower()}")
+    print(f"cells: {', '.join(cells_in_link)}")
+    print("\npairwise correlation:")
+    print("-" * 40)
     
-    # Show correlation between cells in this link
     for i, cell_a in enumerate(cells_in_link):
         for cell_b in cells_in_link[i+1:]:
             corr = correlation_matrix.get(cell_a, {}).get(cell_b, 0)
-            print(f"   {cell_a} ↔ {cell_b}: {corr:.2%} correlation")
+            print(f"  {cell_a} <-> {cell_b}: {corr:.2%}")
     
-    print("\n💡 INTERPRETATION:")
-    print(f'   "These {len(cells_in_link)} cells frequently experience congestion')
-    print('    at the same timestamps. High correlation indicates they likely')
-    print('    share the same Ethernet link in the fronthaul network."')
+    print("\ninterpretation:")
+    print(f"  these {len(cells_in_link)} cells frequently experience congestion")
+    print("  at the same timestamps. high correlation indicates they")
+    print("  likely share the same ethernet link in the fronthaul network.")
     
-    # Also show a low-correlation example
-    print("\n🔍 COUNTER-EXAMPLE (Different Links):")
     link_names = sorted(links.keys())
     if len(link_names) >= 2:
         cell_link1 = links[link_names[0]][0]
         cell_link2 = links[link_names[1]][0]
         corr = correlation_matrix.get(cell_link1, {}).get(cell_link2, 0)
-        print(f"   {cell_link1} ({link_names[0]}) ↔ {cell_link2} ({link_names[1]})")
-        print(f"   Correlation: {corr:.2%}")
-        print('   → Low correlation = different links (as expected)')
+        print("\ncounter-example (different links):")
+        print(f"  {cell_link1} ({link_names[0].lower()}) <-> {cell_link2} ({link_names[1].lower()})")
+        print(f"  correlation: {corr:.2%}")
+        print("  low correlation confirms they are on different links.")
 
 
 def test_c_failure_handling():
     """
-    TEST C: Failure Handling (Maturity Test)
-    ----------------------------------------
-    Proves: Defensive engineering, graceful error handling.
+    test c: failure handling
+    proves: defensive engineering, graceful error handling.
     """
-    print_header("TEST C: FAILURE HANDLING")
+    print_header("test c: failure handling")
     
-    print("\n🧪 Testing error scenarios...\n")
+    print("\ntesting error scenarios:\n")
     
-    # Test 1: Non-existent path
-    print("1️⃣  Invalid data path:")
-    print("    Input: load_data('data/nonexistent')")
+    print("1. invalid data path:")
+    print("   input: load_data('data/nonexistent')")
     try:
         load_data("data/nonexistent")
     except FileNotFoundError as e:
-        print(f"    ✅ Caught FileNotFoundError")
-        print(f"    ✅ Message: \"{str(e)[:60]}...\"")
+        print(f"   result: caught filenotfounderror")
+        print(f"   message: \"{str(e)[:50]}...\"")
     
-    # Test 2: Missing columns (simulate with empty DataFrame)
-    print("\n2️⃣  Missing required columns:")
-    print("    Input: detect_congestion(df_without_packet_loss)")
+    print("\n2. missing required columns:")
+    print("   input: detect_congestion(df_without_packet_loss)")
     try:
         import pandas as pd
         bad_df = pd.DataFrame({"timestamp": [1], "cell_id": ["cell_1"]})
         detect_congestion(bad_df)
     except KeyError as e:
-        print(f"    ✅ Caught KeyError")
-        print(f"    ✅ Message: {str(e)[:60]}")
+        print(f"   result: caught keyerror")
+        print(f"   message: {str(e)[:50]}")
     
-    print("\n💡 INTERPRETATION:")
-    print('   "The system validates inputs and returns clear error messages.')
-    print('    This ensures the backend is not brittle and can guide users')
-    print('    when something goes wrong."')
+    print("\ninterpretation:")
+    print("  the system validates inputs and returns clear error messages.")
+    print("  this ensures the backend is robust and guides users when")
+    print("  something goes wrong.")
 
 
 def export_results(topology, correlation_matrix):
-    """Export results to JSON for PPT/documentation."""
-    print_header("EXPORTING RESULTS")
+    print_header("exporting results")
     
-    # Prepare export data
     export_data = {
         "topology": topology,
         "correlation_matrix": correlation_matrix,
         "summary": {
             "total_cells": len(topology),
             "inferred_links": len(set(topology.values())),
-            "algorithm": "Connected components with correlation threshold 0.7"
+            "algorithm": "connected components with correlation threshold 0.7"
         }
     }
     
@@ -188,41 +166,27 @@ def export_results(topology, correlation_matrix):
     with open(output_path, "w") as f:
         json.dump(export_data, f, indent=2)
     
-    print(f"\n✅ Results exported to: {output_path}")
-    print("   Use this JSON in your PPT or for further analysis.")
+    print(f"\nresults exported to: {output_path}")
 
 
 def main():
-    """Run all Evaluation 1 demo tests."""
-    print("\n" + "█" * 70)
-    print("█" + " " * 68 + "█")
-    print("█" + "  NOKIA HACKATHON - EVALUATION 1 DEMO".center(68) + "█")
-    print("█" + "  5G Fronthaul Topology Inference".center(68) + "█")
-    print("█" + " " * 68 + "█")
-    print("█" * 70)
+    print("\n" + "=" * 70)
+    print("  nokia hackathon - evaluation 1 demo")
+    print("  5g fronthaul topology inference")
+    print("=" * 70)
     
-    # Run Test A (and get results for Test B)
     topology, correlation_matrix, df_cong = test_a_scale_correctness()
-    
-    # Run Test B
     test_b_logical_sanity(topology, correlation_matrix)
-    
-    # Run Test C
     test_c_failure_handling()
-    
-    # Export results
     export_results(topology, correlation_matrix)
     
-    # Final summary
-    print_header("EVALUATION 1 - COMPLETE")
+    print_header("evaluation 1 complete")
     print("""
-    ✅ Test A (Scale):      2.2M rows processed successfully
-    ✅ Test B (Logic):      Topology inference is explainable
-    ✅ Test C (Maturity):   Graceful error handling demonstrated
+  test a (scale):      2.2m rows processed successfully
+  test b (logic):      topology inference is explainable
+  test c (maturity):   graceful error handling demonstrated
     
-    📁 Results saved to:    data/eval1_results.json
-    
-    Ready for presentation!
+  results saved to:    data/eval1_results.json
     """)
 
 

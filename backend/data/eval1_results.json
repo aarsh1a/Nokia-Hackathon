@@ -1,24 +1,24 @@
 {
   "topology": {
-    "cell_22": "Link_1",
     "cell_1": "Link_1",
+    "cell_22": "Link_1",
     "cell_9": "Link_1",
     "cell_17": "Link_1",
-    "cell_19": "Link_2",
-    "cell_8": "Link_2",
-    "cell_10": "Link_2",
     "cell_18": "Link_2",
+    "cell_19": "Link_2",
+    "cell_10": "Link_2",
+    "cell_8": "Link_2",
+    "cell_12": "Link_3",
     "cell_20": "Link_3",
     "cell_5": "Link_3",
-    "cell_12": "Link_3",
     "cell_4": "Link_3",
+    "cell_13": "Link_4",
     "cell_15": "Link_4",
     "cell_7": "Link_4",
     "cell_16": "Link_4",
-    "cell_13": "Link_4",
     "cell_23": "Link_5",
-    "cell_24": "Link_5",
     "cell_2": "Link_5",
+    "cell_24": "Link_5",
     "cell_6": "Link_5",
     "cell_11": "Link_6",
     "cell_14": "Link_7",
@@ -630,6 +630,6 @@
   "summary": {
     "total_cells": 24,
     "inferred_links": 9,
-    "algorithm": "Connected components with correlation threshold 0.7"
+    "algorithm": "connected components with correlation threshold 0.7"
   }
 }

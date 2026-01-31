@@ -29,6 +29,18 @@ pip install -r requirements.txt
 python demo_eval1.py
 ```
 
+## Dataset
+
+The raw `.dat` files (644MB) are not included in the repo.
+
+**Download from Google Drive:**  
+https://drive.google.com/drive/folders/18yGk_sz0NkBNk5fbra4bhRUQyNJVoUA6
+
+After downloading, place files in:
+```
+backend/data/raw/
+```
+
 ## Project Structure
 
 ```
