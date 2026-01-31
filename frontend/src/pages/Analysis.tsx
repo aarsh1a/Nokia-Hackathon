@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Network, Play, RefreshCw, Moon, Sun } from "lucide-react";
-import { datasets, calculateLinkData, cellTopology } from "@/data/networkData";
+import { datasets, calculateLinkData, cellTopology, linkColors } from "@/data/networkData";
 import { TopologyTable } from "@/components/TopologyTable";
 import { TrafficChart } from "@/components/TrafficChart";
 import { CellTrafficChart } from "@/components/CellTrafficChart";
@@ -100,44 +100,40 @@ const Analysis = () => {
             Analysis Configuration
           </h2>
           
-          <div className="flex flex-wrap items-end gap-6">
-            <div className="flex-1 min-w-[200px]">
-              <Label className="text-sm text-muted-foreground mb-2 block">Select Dataset</Label>
-              <Select value={selectedDataset} onValueChange={setSelectedDataset}>
-                <SelectTrigger className="bg-background border-border">
-                  <SelectValue placeholder="Choose a dataset..." />
-                </SelectTrigger>
-                <SelectContent className="bg-popover border-border">
-                  {datasets.map((dataset) => (
-                    <SelectItem key={dataset.id} value={dataset.id}>
-                      <div className="flex flex-col">
-                        <span>{dataset.name}</span>
-                        <span className="text-xs text-muted-foreground">{dataset.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <Label className="text-sm text-muted-foreground whitespace-nowrap">Select Dataset</Label>
+            <Select value={selectedDataset} onValueChange={setSelectedDataset}>
+              <SelectTrigger className="bg-background border-border h-10 w-[320px]">
+                <SelectValue placeholder="Choose a dataset..." />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border">
+                {datasets.map((dataset) => (
+                  <SelectItem key={dataset.id} value={dataset.id}>
+                    <div className="flex flex-col">
+                      <span>{dataset.name}</span>
+                      <span className="text-xs text-muted-foreground">{dataset.description}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            <div className="flex items-center gap-4 p-4 rounded-lg bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <Switch 
-                  id="buffer-mode" 
-                  checked={withBuffer} 
-                  onCheckedChange={setWithBuffer}
-                  className="data-[state=checked]:bg-primary"
-                />
-                <Label htmlFor="buffer-mode" className="text-sm">
-                  {withBuffer ? "With Buffer (4 symbols)" : "Without Buffer"}
-                </Label>
-              </div>
+            <div className="flex items-center gap-3 h-10 px-4 rounded-lg bg-secondary/50">
+              <Switch 
+                id="buffer-mode" 
+                checked={withBuffer} 
+                onCheckedChange={setWithBuffer}
+                className="data-[state=checked]:bg-primary"
+              />
+              <Label htmlFor="buffer-mode" className="text-sm whitespace-nowrap">
+                {withBuffer ? "With Buffer (4 symbols)" : "Without Buffer"}
+              </Label>
             </div>
 
             <Button 
               onClick={handleRunAnalysis}
               disabled={!selectedDataset}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-6"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-6 h-10"
             >
               <Play className="w-4 h-4" />
               Run Analysis
@@ -217,9 +213,9 @@ const Analysis = () => {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-4 mb-4">
-                <span className="text-sm text-muted-foreground">Show links:</span>
-                {linkData.map((link) => (
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="text-sm text-muted-foreground">Shared links:</span>
+                {linkData.filter(l => !l.isolated).map((link) => (
                   <label
                     key={link.linkId}
                     className="flex items-center gap-2 cursor-pointer text-sm"
@@ -228,8 +224,23 @@ const Analysis = () => {
                       checked={selectedLinks.includes(link.linkId)}
                       onCheckedChange={() => toggleLink(link.linkId)}
                     />
-                    <span className="text-foreground">
-                      Link {link.linkId} ({link.cells.length} cells)
+                    <span style={{ color: linkColors[link.linkId] }}>
+                      {link.linkName} ({link.cells.length})
+                    </span>
+                  </label>
+                ))}
+                <span className="text-sm text-muted-foreground ml-2">Isolated:</span>
+                {linkData.filter(l => l.isolated).map((link) => (
+                  <label
+                    key={link.linkId}
+                    className="flex items-center gap-2 cursor-pointer text-sm"
+                  >
+                    <Checkbox
+                      checked={selectedLinks.includes(link.linkId)}
+                      onCheckedChange={() => toggleLink(link.linkId)}
+                    />
+                    <span className="text-muted-foreground">
+                      {link.linkName}
                     </span>
                   </label>
                 ))}
