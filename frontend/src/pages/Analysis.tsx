@@ -1,13 +1,15 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Network, ArrowLeft, Play, RefreshCw } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Network, Play, RefreshCw, Moon, Sun } from "lucide-react";
 import { datasets, calculateLinkData, cellTopology } from "@/data/networkData";
 import { TopologyTable } from "@/components/TopologyTable";
 import { TrafficChart } from "@/components/TrafficChart";
+import { CellTrafficChart } from "@/components/CellTrafficChart";
 import { CorrelationHeatmap } from "@/components/CorrelationHeatmap";
 import { BufferAnalysis } from "@/components/BufferAnalysis";
 import { SummaryTable } from "@/components/SummaryTable";
@@ -17,7 +19,24 @@ const Analysis = () => {
   const [selectedDataset, setSelectedDataset] = useState<string>("");
   const [withBuffer, setWithBuffer] = useState(true);
   const [analysisRun, setAnalysisRun] = useState(false);
-  const [selectedLink, setSelectedLink] = useState<number>(1);
+  const [selectedLinks, setSelectedLinks] = useState<number[]>([1]);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      return saved === "dark" || (!saved && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
 
   const linkData = useMemo(() => calculateLinkData(), []);
 
@@ -29,41 +48,55 @@ const Analysis = () => {
     setAnalysisRun(false);
     setSelectedDataset("");
     setWithBuffer(true);
-    setSelectedLink(1);
+    setSelectedLinks([1]);
+  };
+
+  const toggleLink = (linkId: number) => {
+    setSelectedLinks((prev) => {
+      if (prev.includes(linkId)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((id) => id !== linkId);
+      }
+      return [...prev, linkId].sort((a, b) => a - b);
+    });
   };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-lg z-50">
+      <header className="border-b border-border sticky top-0 bg-background z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Network className="w-5 h-5 text-primary" />
-              </div>
-              <span className="font-semibold text-foreground">Topology Analysis</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Network className="w-5 h-5 text-primary" />
             </div>
+            <span className="font-semibold text-foreground">Fronthaul Analyzer</span>
           </div>
           
-          {analysisRun && (
-            <Button variant="outline" onClick={handleReset} className="gap-2">
-              <RefreshCw className="w-4 h-4" />
-              Reset
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setDarkMode(!darkMode)}
+              className="h-9 w-9"
+            >
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </Button>
-          )}
+            
+            {analysisRun && (
+              <Button variant="outline" onClick={handleReset} className="gap-2">
+                <RefreshCw className="w-4 h-4" />
+                Reset
+              </Button>
+            )}
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto px-6 py-8">
         {/* Controls */}
-        <div className="glass rounded-xl p-6 mb-8">
-          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-6">
+        <div className="border border-border rounded-lg p-6 mb-8 bg-card">
+          <h2 className="text-sm font-medium text-muted-foreground mb-6">
             Analysis Configuration
           </h2>
           
@@ -114,14 +147,14 @@ const Analysis = () => {
 
         {/* Results */}
         {analysisRun && (
-          <div className="space-y-8 animate-fade-in">
+          <div className="space-y-8">
             {/* Insights Panel */}
             <InsightsPanel linkData={linkData} cellTopology={cellTopology} />
 
             {/* Main Grid */}
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Topology Mapping */}
-              <div className="glass rounded-xl p-6">
+              <div className="border border-border rounded-lg p-6 bg-card">
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <div className="w-1 h-5 bg-primary rounded-full" />
                   Topology Mapping
@@ -133,7 +166,7 @@ const Analysis = () => {
               </div>
 
               {/* Correlation Heatmap */}
-              <div className="glass rounded-xl p-6">
+              <div className="border border-border rounded-lg p-6 bg-card">
                 <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                   <div className="w-1 h-5 bg-accent rounded-full" />
                   Traffic Correlation
@@ -145,41 +178,68 @@ const Analysis = () => {
               </div>
             </div>
 
-            {/* Traffic Analysis */}
-            <div className="glass rounded-xl p-6">
+            {/* Cell-wise Traffic Visualization */}
+            <div className="border border-border rounded-lg p-6 bg-card">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <div className="w-1 h-5 bg-primary rounded-full" />
+                Cell-wise Traffic Analysis
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Compare throughput and packet loss patterns across individual cells. 
+                Cells on the same link show correlated behavior during congestion.
+              </p>
+              
+              <Tabs defaultValue="throughput" className="w-full">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="throughput">Throughput</TabsTrigger>
+                  <TabsTrigger value="packetLoss">Packet Loss</TabsTrigger>
+                </TabsList>
+                <TabsContent value="throughput">
+                  <CellTrafficChart mode="throughput" />
+                </TabsContent>
+                <TabsContent value="packetLoss">
+                  <CellTrafficChart mode="packetLoss" />
+                </TabsContent>
+              </Tabs>
+            </div>
+
+            {/* Aggregated Link Traffic */}
+            <div className="border border-border rounded-lg p-6 bg-card">
               <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
                 <div>
                   <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                    <div className="w-1 h-5 bg-primary rounded-full" />
+                    <div className="w-1 h-5 bg-accent rounded-full" />
                     Aggregated Link Traffic
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Data rate over time for selected link
+                    Combined traffic of all cells per inferred fronthaul link
                   </p>
                 </div>
-                
-                <Select 
-                  value={selectedLink.toString()} 
-                  onValueChange={(v) => setSelectedLink(parseInt(v))}
-                >
-                  <SelectTrigger className="w-[180px] bg-background border-border">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover border-border">
-                    {linkData.map((link) => (
-                      <SelectItem key={link.linkId} value={link.linkId.toString()}>
-                        Link {link.linkId} ({link.cells.length} cells)
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 mb-4">
+                <span className="text-sm text-muted-foreground">Show links:</span>
+                {linkData.map((link) => (
+                  <label
+                    key={link.linkId}
+                    className="flex items-center gap-2 cursor-pointer text-sm"
+                  >
+                    <Checkbox
+                      checked={selectedLinks.includes(link.linkId)}
+                      onCheckedChange={() => toggleLink(link.linkId)}
+                    />
+                    <span className="text-foreground">
+                      Link {link.linkId} ({link.cells.length} cells)
+                    </span>
+                  </label>
+                ))}
               </div>
               
-              <TrafficChart linkId={selectedLink} />
+              <TrafficChart linkIds={selectedLinks} />
             </div>
 
             {/* Buffer Impact Analysis */}
-            <div className="glass rounded-xl p-6">
+            <div className="border border-border rounded-lg p-6 bg-card">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <div className="w-1 h-5 bg-warning rounded-full" />
                 Buffer Impact Analysis
@@ -188,7 +248,7 @@ const Analysis = () => {
             </div>
 
             {/* Summary Table */}
-            <div className="glass rounded-xl p-6">
+            <div className="border border-border rounded-lg p-6 bg-card">
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <div className="w-1 h-5 bg-success rounded-full" />
                 Summary Table
@@ -203,14 +263,11 @@ const Analysis = () => {
 
         {/* Empty State */}
         {!analysisRun && (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="p-4 rounded-2xl bg-secondary/50 mb-6">
-              <Network className="w-12 h-12 text-muted-foreground" />
-            </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Ready to Analyze</h3>
-            <p className="text-muted-foreground max-w-md">
-              Select a dataset and configure buffer settings, then click "Run Analysis" 
-              to identify fronthaul topology from traffic patterns.
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <Network className="w-10 h-10 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium text-foreground mb-1">Ready to analyze</h3>
+            <p className="text-sm text-muted-foreground max-w-sm">
+              Select a dataset, set buffer option, then Run Analysis.
             </p>
           </div>
         )}

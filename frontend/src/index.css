@@ -8,36 +8,101 @@
 
 @layer base {
   :root {
-    /* Dark theme by default */
-    --background: 222 47% 6%;
-    --foreground: 210 40% 96%;
+    /* Light theme */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 96%;
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 40% 96%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 187 92% 50%;
-    --primary-foreground: 222 47% 6%;
+    --primary: 187 92% 40%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 30% 14%;
-    --secondary-foreground: 210 40% 90%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 222 30% 12%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 280 82% 65%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 280 82% 55%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 222 30% 18%;
-    --input: 222 30% 16%;
-    --ring: 187 92% 50%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 187 92% 40%;
 
     --radius: 0.75rem;
+
+    /* Link colors for topology visualization */
+    --link-1: 187 92% 40%;
+    --link-2: 280 82% 55%;
+    --link-3: 45 93% 47%;
+    --link-4: 142 76% 36%;
+    --link-5: 0 84% 50%;
+    --link-6: 200 98% 40%;
+
+    /* Status colors */
+    --success: 142 76% 36%;
+    --warning: 45 93% 47%;
+    --danger: 0 84% 50%;
+
+    /* Chart colors */
+    --chart-1: 187 92% 40%;
+    --chart-2: 280 82% 55%;
+    --chart-3: 45 93% 47%;
+    --chart-4: 142 76% 36%;
+    --chart-5: 200 98% 40%;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px hsl(220 13% 91% / 0.5);
+    --shadow-md: 0 4px 16px hsl(220 13% 91% / 0.6);
+    --shadow-lg: 0 8px 32px hsl(220 13% 91% / 0.7);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 187 92% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 187 92% 40%;
+  }
+
+  .dark {
+    /* Dark theme - true black background */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 95%;
+
+    --card: 0 0% 5%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 0 0% 5%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 187 92% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 55%;
+
+    --accent: 280 82% 65%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 15%;
+    --input: 0 0% 12%;
+    --ring: 187 92% 50%;
 
     /* Link colors for topology visualization */
     --link-1: 187 92% 50%;
@@ -59,25 +124,18 @@
     --chart-4: 142 76% 46%;
     --chart-5: 200 98% 50%;
 
-    /* Gradient definitions */
-    --gradient-primary: linear-gradient(135deg, hsl(187 92% 50%) 0%, hsl(200 98% 50%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(280 82% 65%) 0%, hsl(320 82% 60%) 100%);
-    --gradient-surface: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(222 47% 6%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(187 92% 50% / 0.15) 0%, transparent 70%);
-
     /* Shadows */
-    --shadow-sm: 0 2px 8px hsl(222 47% 4% / 0.3);
-    --shadow-md: 0 4px 16px hsl(222 47% 4% / 0.4);
-    --shadow-lg: 0 8px 32px hsl(222 47% 4% / 0.5);
-    --shadow-glow: 0 0 30px hsl(187 92% 50% / 0.3);
+    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.5);
+    --shadow-md: 0 4px 16px hsl(0 0% 0% / 0.6);
+    --shadow-lg: 0 8px 32px hsl(0 0% 0% / 0.7);
 
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 210 40% 90%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 187 92% 50%;
-    --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 222 30% 14%;
-    --sidebar-accent-foreground: 210 40% 90%;
-    --sidebar-border: 222 30% 18%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 15%;
     --sidebar-ring: 187 92% 50%;
   }
 }
@@ -114,44 +172,6 @@
 }
 
 @layer utilities {
-  /* Glow effects */
-  .glow-primary {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--primary) / 0.2);
-  }
-
-  .glow-accent {
-    box-shadow: 0 0 20px hsl(var(--accent) / 0.4), 0 0 40px hsl(var(--accent) / 0.2);
-  }
-
-  /* Glass effect */
-  .glass {
-    background: hsl(var(--card) / 0.6);
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--border) / 0.5);
-  }
-
-  /* Grid pattern background */
-  .grid-pattern {
-    background-image: 
-      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  /* Pulse animation for live data */
-  .pulse-live {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4);
-    }
-    50% {
-      box-shadow: 0 0 20px 4px hsl(var(--primary) / 0.2);
-    }
-  }
-
   /* Link color utilities */
   .text-link-1 { color: hsl(var(--link-1)); }
   .text-link-2 { color: hsl(var(--link-2)); }
