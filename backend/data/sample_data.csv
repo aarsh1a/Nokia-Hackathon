@@ -1,0 +1,13 @@
+timestamp,cell_id,throughput,packet_loss
+0,cell_1,120,0
+0,cell_2,130,0
+0,cell_3,125,0
+0,cell_4,300,1
+1,cell_1,140,0
+1,cell_2,135,0
+1,cell_3,128,0
+1,cell_4,320,1
+2,cell_1,150,0
+2,cell_2,145,0
+2,cell_3,140,0
+2,cell_4,350,1
