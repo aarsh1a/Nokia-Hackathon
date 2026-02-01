@@ -20,6 +20,9 @@ from services.congestion_predictor import (
     train_all_models, predict_congestion_risk, get_risk_category, get_top_features
 )
 
+# Import capacity optimizer (deterministic, SLA-aware)
+from services.capacity_optimizer import optimize_all_links
+
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend
 
@@ -101,8 +104,33 @@ def get_precomputed_predictions():
 _stream_state = {
     'current_index': 0,
     'is_streaming': False,
-    'speed': 1.0  # Multiplier for simulation speed
+    'speed': 1.0,  # Multiplier for simulation speed
+    'loop_count': 0  # Track how many times we've looped through the data
 }
+
+# Cache for features data (avoid loading 2.2M rows on every request!)
+_features_cache = {
+    'df': None,
+    'timestamps': None
+}
+
+
+def get_cached_features():
+    """Load and cache the features dataframe (2.2M rows) - only load ONCE."""
+    global _features_cache
+    
+    if _features_cache['df'] is None:
+        print("[Live Stream] Loading features into cache (this takes a moment)...")
+        if os.path.exists(FEATURES_PATH):
+            df = pd.read_csv(FEATURES_PATH)
+            df = df.sort_values('timestamp').reset_index(drop=True)
+            _features_cache['df'] = df
+            _features_cache['timestamps'] = df['timestamp'].unique()
+            print(f"[Live Stream] Cached {len(df):,} rows, {len(_features_cache['timestamps']):,} timestamps")
+        else:
+            return None, None
+    
+    return _features_cache['df'], _features_cache['timestamps']
 
 
 def load_model_metrics():
@@ -968,17 +996,12 @@ def live_stream():
         action = request.args.get('action', 'next')
         step = int(request.args.get('step', 10))
         
-        # Load the full feature dataset with pre-computed predictions
-        if os.path.exists(FEATURES_PATH):
-            df_features = pd.read_csv(FEATURES_PATH)
-        else:
+        # Use CACHED features (load once, reuse forever)
+        df_features, unique_timestamps = get_cached_features()
+        
+        if df_features is None:
             return jsonify({"error": "Feature dataset not found. Run training first."}), 404
         
-        # Sort by timestamp
-        df_features = df_features.sort_values('timestamp').reset_index(drop=True)
-        
-        # Get unique timestamps
-        unique_timestamps = df_features['timestamp'].unique()
         total_timestamps = len(unique_timestamps)
         
         # Handle actions
@@ -1020,10 +1043,12 @@ def live_stream():
         end_idx = min(start_idx + step, total_timestamps)
         
         if start_idx >= total_timestamps:
-            # Loop back to beginning
+            # Loop back to beginning - CONTINUOUS STREAMING
             _stream_state['current_index'] = 0
+            _stream_state['loop_count'] = _stream_state.get('loop_count', 0) + 1
             start_idx = 0
             end_idx = min(step, total_timestamps)
+            print(f"[Live Stream] Loop #{_stream_state['loop_count']} - Restarting from beginning")
         
         # Get timestamps in the window
         window_timestamps = unique_timestamps[start_idx:end_idx]
@@ -1125,8 +1150,10 @@ def live_stream():
                 "step": step,
                 "totalTimestamps": total_timestamps,
                 "progress": round(end_idx / total_timestamps * 100, 1),
-                "hasMore": end_idx < total_timestamps
+                "hasMore": True,  # Always has more - continuous loop!
+                "loopCount": _stream_state.get('loop_count', 0)
             },
+            "dataSource": FEATURES_PATH,
             "batchSummary": {
                 "avgRisk": round(sum(all_risks) / len(all_risks), 4) if all_risks else 0,
                 "maxRisk": round(max(all_risks), 4) if all_risks else 0,
@@ -1280,6 +1307,136 @@ def predict_sample():
         })
     
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# =============================================================================
+# CAPACITY PLANNING - DETERMINISTIC SLA-AWARE OPTIMIZATION
+# =============================================================================
+
+@app.route("/api/capacity-recommendations")
+def capacity_recommendations():
+    """
+    Get cost-aware capacity tier recommendations for all links.
+    
+    Uses REAL traffic data from data/raw/*.dat files.
+    Recalculates fresh on every request (no caching).
+    
+    Algorithm:
+    1. Load real throughput data from raw .dat files
+    2. Aggregate traffic per link (based on inferred topology)
+    3. For each link, test 10G/25G/50G capacity with buffer model
+    4. Select lowest-cost tier that meets SLA (≤1% loss)
+    """
+    try:
+        print("[Capacity] Loading FRESH data from data/raw/...")
+        
+        # Load FRESH topology (no cache)
+        df = load_data(DATA_PATH)
+        df = detect_congestion(df)
+        corr_matrix = compute_congestion_correlation(df)
+        topology = infer_topology(corr_matrix)
+        
+        print(f"[Capacity] Topology: {len(topology)} cells -> {len(set(topology.values()))} links")
+        
+        # Load FRESH throughput data from raw files
+        throughput_data = load_all_throughput_indexed(DATA_PATH)
+        slot_data = convert_symbols_to_slots(throughput_data)
+        link_traffic_df = aggregate_slot_traffic_by_link(slot_data, topology)
+        
+        print(f"[Capacity] Traffic data: {len(link_traffic_df)} slots loaded")
+        
+        # Prepare traffic data per link (bits per slot)
+        link_traffic = {}
+        for col in link_traffic_df.columns:
+            if col.endswith('_bits'):
+                link_name = col.replace('_bits', '')
+                link_traffic[link_name] = link_traffic_df[col].tolist()
+        
+        print(f"[Capacity] Analyzing {len(link_traffic)} links...")
+        
+        # Run optimization on REAL traffic data
+        recommendations = optimize_all_links(topology, link_traffic)
+        
+        print(f"[Capacity] Done! Savings: {recommendations['summary']['overall_cost_savings_percent']}%")
+        
+        return jsonify(recommendations)
+    
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+
+# Cache for traffic data (avoid reloading on every capacity request)
+_traffic_cache = {
+    'link_traffic_df': None,
+    'topology': None
+}
+
+
+def get_cached_traffic():
+    """Load and cache traffic data for capacity optimization."""
+    global _traffic_cache
+    
+    if _traffic_cache['link_traffic_df'] is None:
+        print("[Capacity] Loading traffic data into cache...")
+        analysis = get_cached_analysis()
+        topology = analysis['topology']
+        
+        throughput_data = load_all_throughput_indexed(DATA_PATH)
+        slot_data = convert_symbols_to_slots(throughput_data)
+        link_traffic_df = aggregate_slot_traffic_by_link(slot_data, topology)
+        
+        _traffic_cache['link_traffic_df'] = link_traffic_df
+        _traffic_cache['topology'] = topology
+        print(f"[Capacity] Cached {len(link_traffic_df)} slots of traffic data")
+    
+    return _traffic_cache['link_traffic_df'], _traffic_cache['topology']
+
+
+@app.route("/api/live-capacity")
+def live_capacity():
+    """
+    Get capacity recommendations synced with live stream position.
+    
+    Uses CACHED traffic data - fast response after first load.
+    """
+    try:
+        # Get current stream position
+        current_idx = _stream_state.get('current_index', 0)
+        
+        # Use CACHED traffic data
+        link_traffic_df, topology = get_cached_traffic()
+        
+        total_slots = len(link_traffic_df)
+        
+        # Use data up to current stream position
+        window_end = max(1000, min(current_idx * 10, total_slots))
+        
+        # Prepare traffic data per link (only up to current position)
+        link_traffic = {}
+        for col in link_traffic_df.columns:
+            if col.endswith('_bits'):
+                link_name = col.replace('_bits', '')
+                link_traffic[link_name] = link_traffic_df[col].iloc[:window_end].tolist()
+        
+        # Run optimization on windowed data
+        recommendations = optimize_all_links(topology, link_traffic)
+        
+        # Add stream info
+        recommendations['stream'] = {
+            'position': current_idx,
+            'window_slots': window_end,
+            'total_slots': total_slots,
+            'progress_percent': round((window_end / total_slots) * 100, 1)
+        }
+        
+        return jsonify(recommendations)
+    
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
 

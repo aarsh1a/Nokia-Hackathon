@@ -17,6 +17,7 @@ import { InsightsPanel } from "@/components/InsightsPanel";
 import { NetworkTopology } from "@/components/NetworkTopology";
 import { LinkTrafficVisualization } from "@/components/LinkTrafficVisualization";
 import { CongestionPrediction } from "@/components/CongestionPrediction";
+import { CapacityPlanning } from "@/components/CapacityPlanning";
 import {
   runAnalysis,
   getCellStats,
@@ -408,6 +409,7 @@ const Analysis = () => {
 
         {/* Results */}
         {analysisRun && (
+          <>
           <div className="flex gap-6">
             {/* Main Content */}
             <div className="flex-1 space-y-8 min-w-0">
@@ -438,9 +440,6 @@ const Analysis = () => {
                   <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                     <div className="w-1 h-5 bg-primary rounded-full" />
                     ML Congestion Prediction
-                    <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full ml-2">
-                      Optional ML Extension
-                    </span>
                   </h3>
                   <p className="text-sm text-muted-foreground mb-6">
                     Machine learning model predicts congestion risk before it happens.
@@ -623,7 +622,26 @@ const Analysis = () => {
               </p>
               <SummaryTable linkData={linkData} cellTopology={currentCellTopology} />
             </div>
+
           </div>
+
+          {/* Capacity Planning - At the very bottom */}
+          {isLiveMode && (
+            <div className="border border-green-500/30 rounded-2xl p-8 bg-card mt-8 animate-slide-up">
+              <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-3">
+                <div className="w-1.5 h-6 bg-green-500 rounded-full" />
+                Link Capacity Optimization
+                <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">
+                  Cost Savings
+                </span>
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                Optimal Ethernet tier for each link based on actual traffic — minimizing cost while meeting SLA.
+              </p>
+              <CapacityPlanning />
+            </div>
+          )}
+          </>
         )}
 
         {/* Empty State */}
