@@ -30,10 +30,11 @@ export function BufferAnalysis({ linkData, withBuffer }: BufferAnalysisProps) {
       <div className="p-4 rounded-lg bg-secondary/30 border border-border">
         <h4 className="font-medium text-foreground mb-2">How Buffer Size Affects Capacity</h4>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          A 4-symbol buffer smooths traffic peaks by temporarily storing excess data during congestion spikes. 
-          This allows the fronthaul link to operate at a lower provisioned capacity while still handling 
-          bursty traffic patterns. Without buffering, the link must be provisioned for absolute peak rates, 
-          resulting in <span className="text-warning font-medium">15-20% higher capacity requirements</span>.
+          A <span className="text-primary font-medium">4-symbol buffer (143µs)</span> smooths traffic peaks by temporarily storing excess data during congestion spikes.
+          This allows the fronthaul link to operate at a lower provisioned capacity while still handling
+          bursty traffic patterns. Packet losses are permitted for up to <span className="text-warning font-medium">1% of slots</span> carrying traffic per cell.
+          Without buffering, the link must be provisioned for absolute peak rates,
+          resulting in <span className="text-destructive font-medium">15-20% higher capacity requirements</span>.
         </p>
       </div>
 
@@ -62,34 +63,34 @@ export function BufferAnalysis({ linkData, withBuffer }: BufferAnalysisProps) {
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-            <XAxis 
-              dataKey="name" 
+            <XAxis
+              dataKey="name"
               stroke="hsl(var(--muted-foreground))"
               fontSize={12}
             />
-            <YAxis 
+            <YAxis
               stroke="hsl(var(--muted-foreground))"
               fontSize={12}
-              label={{ 
-                value: 'Required Capacity (Gbps)', 
-                angle: -90, 
+              label={{
+                value: 'Required Capacity (Gbps)',
+                angle: -90,
                 position: 'insideLeft',
                 style: { fill: 'hsl(var(--muted-foreground))' }
               }}
             />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--popover))', 
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '8px',
                 color: 'hsl(var(--foreground))'
               }}
               formatter={(value: number, name: string) => [
-                `${value.toFixed(2)} Gbps`, 
+                `${value.toFixed(2)} Gbps`,
                 name === 'withBuffer' ? 'With Buffer' : 'Without Buffer'
               ]}
             />
-            <Legend 
+            <Legend
               formatter={(value) => value === 'withBuffer' ? 'With Buffer (4 symbols)' : 'Without Buffer'}
               wrapperStyle={{ color: 'hsl(var(--foreground))' }}
             />
@@ -108,7 +109,7 @@ export function BufferAnalysis({ linkData, withBuffer }: BufferAnalysisProps) {
           </span>
         </div>
         <p className="text-xs text-muted-foreground mt-1 ml-4">
-          {withBuffer 
+          {withBuffer
             ? 'Optimized capacity calculation accounting for buffer smoothing effects'
             : 'Raw peak-based capacity calculation without traffic smoothing'}
         </p>

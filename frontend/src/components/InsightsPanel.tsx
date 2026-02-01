@@ -1,5 +1,5 @@
 import { LinkData, CellData } from "@/data/networkData";
-import { AlertTriangle, CheckCircle, TrendingUp, Zap, Lightbulb, Users } from "lucide-react";
+import { AlertTriangle, CheckCircle, TrendingUp, Zap, Lightbulb, Users, DollarSign } from "lucide-react";
 
 interface InsightsPanelProps {
   linkData: LinkData[];
@@ -27,6 +27,13 @@ export function InsightsPanel({ linkData, cellTopology }: InsightsPanelProps) {
     curr.avgLoss > prev.avgLoss ? curr : prev
   );
 
+  // Calculate capacity savings (naive vs optimized)
+  const naiveCapacity = cellTopology.reduce((sum, c) => sum + c.peakTraffic, 0);
+  const optimizedCapacity = linkData.reduce((sum, l) => sum + l.requiredCapacityWithBuffer, 0);
+  const savingsPercent = naiveCapacity > 0
+    ? Math.round(((naiveCapacity - optimizedCapacity) / naiveCapacity) * 100)
+    : 0;
+
   const insights = [
     {
       icon: CheckCircle,
@@ -47,10 +54,10 @@ export function InsightsPanel({ linkData, cellTopology }: InsightsPanelProps) {
       description: `${congestedLink.linkName} has ${congestedLink.cells.length} cells sharing bandwidth`,
     },
     {
-      icon: Zap,
+      icon: DollarSign,
       type: "success" as const,
-      title: "Buffer Optimization",
-      description: `4-symbol buffer reduces total capacity requirement by ~18%`,
+      title: "Cost Savings",
+      description: `${savingsPercent}% capacity reduction vs naive per-cell provisioning`,
     },
   ];
 
