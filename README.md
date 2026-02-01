@@ -164,22 +164,39 @@ This allows judges to verify each requirement **step by step**.
 
 ### Prerequisites
 - Node.js (18 or later)
+- Python (3.9 or later)
 - npm
 
 ### Steps
 
-```sh
-# Clone the repository
-git clone <YOUR_GIT_URL>
+**1. Start the Backend**
 
-# Navigate to the project directory
-cd <YOUR_PROJECT_NAME>
+```sh
+# Navigate to the backend directory
+cd backend
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# Start the Flask server
+python app.py
+```
+
+The backend API will be available at: `http://localhost:8000`
+
+**2. Start the Frontend**
+
+```sh
+# Open a new terminal and navigate to the frontend directory
+cd frontend
 
 # Install dependencies
 npm install
 
 # Start the development server
 npm run dev
+```
 
-The application will be available at:
-http://localhost:5173
+The application will be available at: `http://localhost:5173`
+
+> **Note:** The frontend requires the backend to be running for Live Analysis mode. Static dataset analysis works without the backend.
