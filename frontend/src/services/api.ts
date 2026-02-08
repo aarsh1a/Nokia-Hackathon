@@ -61,7 +61,7 @@ export interface TimeseriesResult {
  */
 export async function checkBackendHealth(): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE}/health`, { 
+    const response = await fetch(`${API_BASE}/health`, {
       method: 'GET',
       signal: AbortSignal.timeout(3000)
     });
@@ -359,7 +359,7 @@ export async function getLiveStream(action: 'next' | 'start' | 'stop' | 'reset' 
  * Get current snapshot at specific index
  */
 export async function getLiveSnapshot(index?: number): Promise<LiveSnapshotResult> {
-  const url = index !== undefined 
+  const url = index !== undefined
     ? `${API_BASE}/api/live-snapshot?index=${index}`
     : `${API_BASE}/api/live-snapshot`;
   const response = await fetch(url);
