@@ -3,6 +3,7 @@ flask
 flask-cors
 pandas
 numpy
+gunicorn
 
 # Machine Learning dependencies for congestion prediction
 scikit-learn
