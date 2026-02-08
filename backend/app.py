@@ -169,6 +169,34 @@ def health():
     return jsonify({"status": "ok"})
 
 
+@app.route("/debug/files")
+def debug_files():
+    """Debug endpoint to check data files on server."""
+    import glob
+    data_path = "data/raw"
+    files = []
+    if os.path.exists(data_path):
+        files = os.listdir(data_path)
+    pkt_files = glob.glob(os.path.join(data_path, 'pkt-stats-cell-*.dat'))
+    
+    # Try to read first few lines of first file
+    sample_content = ""
+    if pkt_files:
+        try:
+            with open(pkt_files[0], 'r') as f:
+                sample_content = f.read(500)
+        except Exception as e:
+            sample_content = str(e)
+    
+    return jsonify({
+        "data_path_exists": os.path.exists(data_path),
+        "all_files": files[:20],
+        "pkt_stat_files_count": len(pkt_files),
+        "first_file": pkt_files[0] if pkt_files else None,
+        "sample_content": sample_content
+    })
+
+
 @app.route("/analyze")
 def analyze():
     """
