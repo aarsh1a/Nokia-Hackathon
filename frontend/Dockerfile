@@ -1,13 +1,13 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Clean install with fresh node_modules
-RUN npm install
+# Delete lockfile and do fresh install to fix rollup native deps
+RUN rm -f package-lock.json && npm install
 
 # Copy source code
 COPY . .
