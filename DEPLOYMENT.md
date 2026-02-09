@@ -169,10 +169,7 @@ CORS(app, origins=["https://your-frontend-url.vercel.app"])
 - Common issues: Missing dependencies, import errors, data files not found
 
 **Problem**: Build fails with pandas compilation errors (Python 3.13 compatibility)
-- **Solution**: The `runtime.txt` file forces Python 3.11. If issues persist:
-  1. Verify `backend/runtime.txt` contains `python-3.11.9`
-  2. In Render dashboard, check Python version in build logs
-  3. If still using Python 3.13, manually set Python version in Render settings
+- **Solution**: Updated pandas to version 2.2.3+ which supports Python 3.13. The requirements.txt now uses `pandas>=2.2.3` which will work with Python 3.13 that Render uses by default.
 
 **Problem**: Backend times out
 - **Solution**: Render free tier has cold starts. First request after inactivity takes longer.
