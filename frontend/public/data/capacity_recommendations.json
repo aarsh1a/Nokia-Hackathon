@@ -1,0 +1,465 @@
+{
+  "metadata": {
+    "generated_at": "2026-02-01T03:07:08.767861",
+    "sla_packet_loss_threshold": 0.01,
+    "buffer_symbols": 4,
+    "buffer_time_us": 142.8,
+    "capacity_tiers": {
+      "10G": {
+        "capacity_gbps": 10,
+        "relative_cost": 1.0,
+        "label": "10 Gbps"
+      },
+      "25G": {
+        "capacity_gbps": 25,
+        "relative_cost": 2.2,
+        "label": "25 Gbps"
+      },
+      "50G": {
+        "capacity_gbps": 50,
+        "relative_cost": 4.0,
+        "label": "50 Gbps"
+      }
+    }
+  },
+  "summary": {
+    "total_links": 9,
+    "tier_distribution": {
+      "10G": 5,
+      "25G": 4,
+      "50G": 0
+    },
+    "average_cost_savings": 61.7
+  },
+  "recommendations": [
+    {
+      "link_id": "1",
+      "link_name": "Link_1",
+      "cells": [
+        "cell_1",
+        "cell_9",
+        "cell_17",
+        "cell_22"
+      ],
+      "peak_traffic_gbps": 11.4,
+      "avg_traffic_gbps": 5.0,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": false,
+          "estimated_packet_loss": 1.0,
+          "congestion_risk": 1.0,
+          "headroom_percent": 0.0,
+          "reason": "Capacity (10G) is below peak traffic (11.40G)"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 54.4,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=54.4%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 77.2,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=77.2%"
+        }
+      },
+      "recommended_tier": "25G",
+      "recommended_capacity_gbps": 25,
+      "cost_savings_percent": 45.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 25G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=54.4%"
+    },
+    {
+      "link_id": "2",
+      "link_name": "Link_2",
+      "cells": [
+        "cell_8",
+        "cell_10",
+        "cell_18",
+        "cell_19"
+      ],
+      "peak_traffic_gbps": 14.1,
+      "avg_traffic_gbps": 7.3,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": false,
+          "estimated_packet_loss": 1.0,
+          "congestion_risk": 1.0,
+          "headroom_percent": 0.0,
+          "reason": "Capacity (10G) is below peak traffic (14.10G)"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0.128,
+          "headroom_percent": 43.6,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=43.6%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 71.8,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=71.8%"
+        }
+      },
+      "recommended_tier": "25G",
+      "recommended_capacity_gbps": 25,
+      "cost_savings_percent": 45.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 25G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=43.6%"
+    },
+    {
+      "link_id": "3",
+      "link_name": "Link_3",
+      "cells": [
+        "cell_4",
+        "cell_5",
+        "cell_12",
+        "cell_20"
+      ],
+      "peak_traffic_gbps": 7.6,
+      "avg_traffic_gbps": 3.4,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0.52,
+          "headroom_percent": 24.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=24.0%"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 69.6,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=69.6%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 84.8,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=84.8%"
+        }
+      },
+      "recommended_tier": "10G",
+      "recommended_capacity_gbps": 10,
+      "cost_savings_percent": 75.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 10G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=24.0%"
+    },
+    {
+      "link_id": "4",
+      "link_name": "Link_4",
+      "cells": [
+        "cell_7",
+        "cell_13",
+        "cell_15",
+        "cell_16"
+      ],
+      "peak_traffic_gbps": 12.9,
+      "avg_traffic_gbps": 6.2,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": false,
+          "estimated_packet_loss": 1.0,
+          "congestion_risk": 1.0,
+          "headroom_percent": 0.0,
+          "reason": "Capacity (10G) is below peak traffic (12.90G)"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0.032,
+          "headroom_percent": 48.4,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=48.4%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 74.2,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=74.2%"
+        }
+      },
+      "recommended_tier": "25G",
+      "recommended_capacity_gbps": 25,
+      "cost_savings_percent": 45.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 25G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=48.4%"
+    },
+    {
+      "link_id": "5",
+      "link_name": "Link_5",
+      "cells": [
+        "cell_2",
+        "cell_6",
+        "cell_23",
+        "cell_24"
+      ],
+      "peak_traffic_gbps": 16.9,
+      "avg_traffic_gbps": 8.9,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": false,
+          "estimated_packet_loss": 1.0,
+          "congestion_risk": 1.0,
+          "headroom_percent": 0.0,
+          "reason": "Capacity (10G) is below peak traffic (16.90G)"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0.352,
+          "headroom_percent": 32.4,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=32.4%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 66.2,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=66.2%"
+        }
+      },
+      "recommended_tier": "25G",
+      "recommended_capacity_gbps": 25,
+      "cost_savings_percent": 45.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 25G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=32.4%"
+    },
+    {
+      "link_id": "6",
+      "link_name": "Link_6",
+      "cells": [
+        "cell_11"
+      ],
+      "peak_traffic_gbps": 2.5,
+      "avg_traffic_gbps": 1.1,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 75.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=75.0%"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 90.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=90.0%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 95.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=95.0%"
+        }
+      },
+      "recommended_tier": "10G",
+      "recommended_capacity_gbps": 10,
+      "cost_savings_percent": 75.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 10G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=75.0%"
+    },
+    {
+      "link_id": "7",
+      "link_name": "Link_7",
+      "cells": [
+        "cell_14"
+      ],
+      "peak_traffic_gbps": 2.8,
+      "avg_traffic_gbps": 1.3,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 72.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=72.0%"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 88.8,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=88.8%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 94.4,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=94.4%"
+        }
+      },
+      "recommended_tier": "10G",
+      "recommended_capacity_gbps": 10,
+      "cost_savings_percent": 75.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 10G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=72.0%"
+    },
+    {
+      "link_id": "8",
+      "link_name": "Link_8",
+      "cells": [
+        "cell_21"
+      ],
+      "peak_traffic_gbps": 2.3,
+      "avg_traffic_gbps": 1.0,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 77.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=77.0%"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 90.8,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=90.8%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 95.4,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=95.4%"
+        }
+      },
+      "recommended_tier": "10G",
+      "recommended_capacity_gbps": 10,
+      "cost_savings_percent": 75.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 10G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=77.0%"
+    },
+    {
+      "link_id": "9",
+      "link_name": "Link_9",
+      "cells": [
+        "cell_3"
+      ],
+      "peak_traffic_gbps": 2.1,
+      "avg_traffic_gbps": 0.9,
+      "tier_evaluations": {
+        "10G": {
+          "tier_name": "10G",
+          "capacity_gbps": 10,
+          "relative_cost": 1.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 79.0,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=79.0%"
+        },
+        "25G": {
+          "tier_name": "25G",
+          "capacity_gbps": 25,
+          "relative_cost": 2.2,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 91.6,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=91.6%"
+        },
+        "50G": {
+          "tier_name": "50G",
+          "capacity_gbps": 50,
+          "relative_cost": 4.0,
+          "sla_pass": true,
+          "estimated_packet_loss": 0.0,
+          "congestion_risk": 0,
+          "headroom_percent": 95.8,
+          "reason": "Meets SLA: loss=0.00% \u2264 1.0%, headroom=95.8%"
+        }
+      },
+      "recommended_tier": "10G",
+      "recommended_capacity_gbps": 10,
+      "cost_savings_percent": 75.0,
+      "ml_congestion_risk": null,
+      "recommendation_reason": "Selected 10G as lowest-cost option meeting SLA. Meets SLA: loss=0.00% \u2264 1.0%, headroom=79.0%"
+    }
+  ]
+}

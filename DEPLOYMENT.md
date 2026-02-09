@@ -106,7 +106,7 @@ The frontend is already configured to use environment variables. You'll set the 
 4. **Environment Variables**
    - Click **"Environment Variables"**
    - Add a new variable:
-     - **Key**: `VITE_API_BASE_URL`
+     - **Key**: `VITE_API_URL`
      - **Value**: `https://your-render-backend-url.onrender.com` (use your actual Render URL)
      - **Environment**: Select all (Production, Preview, Development)
    - Click **"Save"**
@@ -154,7 +154,7 @@ CORS(app, origins=["https://your-frontend-url.vercel.app"])
 - No additional environment variables needed (uses `$PORT` automatically)
 
 **Frontend (Vercel)**:
-- `VITE_API_BASE_URL`: Your Render backend URL (e.g., `https://nokia-hackathon-backend.onrender.com`)
+- `VITE_API_URL`: Your Render backend URL (e.g., `https://nokia-hackathon-backend.onrender.com`)
 
 ---
 
@@ -176,7 +176,7 @@ CORS(app, origins=["https://your-frontend-url.vercel.app"])
 
 **Problem**: Frontend can't connect to backend
 - **Solution**: 
-  1. Verify `VITE_API_BASE_URL` is set correctly in Vercel
+  1. Verify `VITE_API_URL` is set correctly in Vercel
   2. Check backend URL is accessible (visit `/health` endpoint)
   3. Ensure backend CORS is configured correctly
 

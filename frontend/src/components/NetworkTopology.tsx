@@ -22,11 +22,13 @@ export function NetworkTopology() {
 
     // Add link nodes and edges to BBU
     linkData.forEach((link) => {
+      const isPrimary = link.linkId >= 1 && link.linkId <= 3;
       nodes.push({
         data: {
           id: `link_${link.linkId}`,
           label: link.linkName,
           type: link.isolated ? "isolated-link" : "shared-link",
+          isPrimary,
           color: link.color,
           cellCount: link.cells.length,
           avgTraffic: link.avgTraffic,
@@ -136,6 +138,22 @@ export function NetworkTopology() {
             "shadow-opacity": 0.6,
             "shadow-offset-x": 0,
             "shadow-offset-y": 3,
+          },
+        },
+        // Primary links (1, 2, 3) - intense white glow
+        {
+          selector: 'node[id="link_1"], node[id="link_2"], node[id="link_3"]',
+          style: {
+            width: 75,
+            height: 75,
+            "border-width": 6,
+            "border-color": "#ffffff",
+            "border-opacity": 1,
+            "shadow-blur": 150,
+            "shadow-color": "#ffffff",
+            "shadow-opacity": 1,
+            "shadow-offset-x": 0,
+            "shadow-offset-y": 0,
           },
         },
         // Isolated link nodes - 3D effect
@@ -334,13 +352,37 @@ export function NetworkTopology() {
   return (
     <div className="relative w-full h-[550px] rounded-lg overflow-hidden border border-border" style={{ background: "radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0a 100%)" }}>
       <div ref={containerRef} className="w-full h-full" />
-      
+
       {/* Legend */}
       <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm rounded-lg p-4 text-sm space-y-3">
         <div className="text-foreground font-semibold mb-3">Network Topology</div>
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 rounded-full bg-cyan-400 shadow-lg shadow-cyan-400/50" />
           <span className="text-foreground">BBU (Central Unit)</span>
+        </div>
+        <div
+          className="flex items-center gap-3 cursor-pointer hover:bg-white/10 rounded px-1 -mx-1 transition-colors"
+          onMouseEnter={() => {
+            const cy = cyRef.current;
+            if (!cy) return;
+            cy.elements().addClass("faded");
+            cy.getElementById("link_1").removeClass("faded").addClass("highlighted");
+            cy.getElementById("link_2").removeClass("faded").addClass("highlighted");
+            cy.getElementById("link_3").removeClass("faded").addClass("highlighted");
+            cy.getElementById("bbu").removeClass("faded");
+            // Highlight cells belonging to link 1, 2, 3
+            cy.nodes().filter((n) => [1, 2, 3].includes(n.data("linkId"))).removeClass("faded").addClass("highlighted");
+            // Highlight edges
+            cy.edges().filter((e) => ["link_1", "link_2", "link_3"].includes(e.source().id()) || ["link_1", "link_2", "link_3"].includes(e.target().id())).removeClass("faded").addClass("highlighted");
+          }}
+          onMouseLeave={() => {
+            const cy = cyRef.current;
+            if (!cy) return;
+            cy.elements().removeClass("highlighted faded");
+          }}
+        >
+          <div className="w-4 h-4 rounded-full bg-purple-400 shadow-md shadow-purple-400/50 ring-2 ring-white" />
+          <span className="text-foreground">Primary Links (1,2,3)</span>
         </div>
         <div className="flex items-center gap-3">
           <div className="w-4 h-4 rounded-full bg-purple-400 shadow-md shadow-purple-400/50" />
