@@ -168,8 +168,11 @@ CORS(app, origins=["https://your-frontend-url.vercel.app"])
 - **Solution**: Check Render logs → Logs tab in Render dashboard
 - Common issues: Missing dependencies, import errors, data files not found
 
-**Problem**: Build fails with pandas compilation errors (Python 3.13 compatibility)
-- **Solution**: Updated pandas to version 2.2.3+ which supports Python 3.13. The requirements.txt now uses `pandas>=2.2.3` which will work with Python 3.13 that Render uses by default.
+**Problem**: Build fails with pandas/scikit-learn compilation errors (Python 3.13 compatibility)
+- **Solution**: Updated dependencies to versions that support Python 3.13:
+  - `pandas>=2.2.3` (supports Python 3.13)
+  - `scikit-learn>=1.4.0` (supports Python 3.13)
+  - These versions work with Python 3.13 that Render uses by default.
 
 **Problem**: Backend times out
 - **Solution**: Render free tier has cold starts. First request after inactivity takes longer.
