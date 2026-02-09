@@ -49,10 +49,12 @@ git push origin main
    - **Region**: Choose closest to your users (e.g., `Oregon (US West)`)
    - **Branch**: `main`
    - **Root Directory**: `backend` ⚠️ **Important!**
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
+   - **Environment**: `Python 3` (will use Python 3.11 from `runtime.txt`)
+   - **Build Command**: `pip install --upgrade pip && pip install -r requirements.txt`
    - **Start Command**: `gunicorn app:app --bind 0.0.0.0:$PORT`
    - **Plan**: Select **Free** (or paid if you prefer)
+   
+   **Note**: The `runtime.txt` file ensures Python 3.11 is used (required for pandas compatibility)
 
 4. **Environment Variables** (Optional)
    - You can add environment variables here if needed
@@ -165,6 +167,12 @@ CORS(app, origins=["https://your-frontend-url.vercel.app"])
 **Problem**: Backend returns 500 errors
 - **Solution**: Check Render logs → Logs tab in Render dashboard
 - Common issues: Missing dependencies, import errors, data files not found
+
+**Problem**: Build fails with pandas compilation errors (Python 3.13 compatibility)
+- **Solution**: The `runtime.txt` file forces Python 3.11. If issues persist:
+  1. Verify `backend/runtime.txt` contains `python-3.11.9`
+  2. In Render dashboard, check Python version in build logs
+  3. If still using Python 3.13, manually set Python version in Render settings
 
 **Problem**: Backend times out
 - **Solution**: Render free tier has cold starts. First request after inactivity takes longer.
